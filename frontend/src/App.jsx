@@ -1,5 +1,4 @@
 import './App.css'
-import ReactDOM from "react-dom/client"
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './componenets/pages/Home'
 import Gyms from './componenets/pages/Gyms'
@@ -14,12 +13,11 @@ function App() {
     <FormProvider>
     <BrowserRouter>
       <Routes>
-      <Route index element={<Home />} />
-      <Route path="location" element={<Location />} />
-      <Route path="gyms" element={<Gyms />} />
-      <Route path="feedback" element={<Feedback />} />
-      <Route path="test" element={<Test />} />
-
+        <Route index element={<Home />} />
+        <Route path="/location" element={<Location />} />
+        <Route path="/gyms" element={<Gyms />} />
+        <Route path="/feedback" element={<Feedback />} />
+        <Route path="/test" element={<Test />} />
       </Routes>
     </BrowserRouter>
     </FormProvider>

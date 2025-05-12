@@ -2,20 +2,20 @@ import React, { useState } from 'react';
 
 const HomeWhiteButton = ({ eventHandler, inputType, initialValue, name, value }) => {
   const [inputValue, setInputValue] = useState(value || '');
-  {console.log(value)}
 
   return (
-    <div className='w-full md:w-[70%] h-[60%] border rounded-md border-spacing-2 my-2 flex'>
+    <div className='w-full h-[60%] border rounded-md border-spacing-2 my-2 flex'>
       <input
+        name={name}
         type={inputType}
         value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onClick={(e) => eventHandler(e)}
+        onChange={(e) => {
+          eventHandler(e)
+          setInputValue(e.target.value)
+        }}
         className="w-full px-3"
-        
       />
-      
-      </div>
+    </div>
   );
 };
 

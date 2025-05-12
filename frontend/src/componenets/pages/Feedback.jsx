@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LeftBar from '../LeftBar';
 import RightBar from '../RightBar';
 import navRating from '../../assets/pre-register/navRating.png';
@@ -9,9 +9,13 @@ import BlueButton from '../buttons/BlueButton';
 import WhiteButton from '../buttons/WhiteButton';
 import BlankStar from '../stars/BlankStar';
 import YellowStar from '../stars/YellowStar';
+import axios from 'axios';
 
 const Feedback = () => {
   const [rate, setRate] = useState(0);
+  const [review, setReview] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const maxRating = 5;  
   function setRating(index) {
     setRate(index);
@@ -21,9 +25,19 @@ const Feedback = () => {
     return index < rate ? <YellowStar /> : <BlankStar />;
   }
 
+  async function eventHandler() {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const userId = user.id;
 
-  function eventHandler() {
-    console.log("hello");
+      const res = await axios.post("http://localhost:3000/feedback", {
+        message: review,
+        rating: rate,
+        userId: userId
+      }); 
+    } catch(error) {
+      console.log("Error while post feedback", error);
+    } 
   }
 
   const rightBarProps = {
@@ -33,17 +47,18 @@ const Feedback = () => {
   };
 
   const BlueButtonProps = {
+    disabled: loading,
     eventHandler: eventHandler,
     description: "Submit Application"
   };
 
-  const WhiteButtonProps = {
-    eventHandler: eventHandler,
-    description: "Cancel"
-  };
+  // const WhiteButtonProps = {
+  //   eventHandler: eventHandler,
+  //   description: "Cancel"
+  // };
 
   return (
-    <div className="absolute w-full h-screen px-1 sm:px-4 md-8 lg:px-16 py-1 sm:py-4 lg:py-10 bg-[#D3D8DF]">
+    <div className="absolute w-full h-screen sm:px-4 md-8 lg:px-16 py-1 sm:py-4 lg:py-10 bg-[#D3D8DF]">
       <div className="flex flex-col sm:flex-row w-[100%] h-[100%] ">
         <LeftBar 
           firstHeading="We Value Your" 
@@ -55,11 +70,11 @@ const Feedback = () => {
           <div className="w-full h-full">
             <div className="flex-1 h-full flex-col">
               <div className="flex-1">
-                <div className="text-left text-2xl mt-4 mb-8 my-16" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0)' }}>
+                <div className="text-left text-2xl my-4" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0)' }}>
                   <div className=' flex flex-col items-center'>
                   <div className='bg-[#005EFF] w-[55%] h-0.5 flex justify-center m-2'></div>
                   <div className="font-extrabold text-2xl font-plus-jakarta">Rate your experience!</div>
-                  <div className="flex flex-row space-x-4 mt-4 p-2">
+                  <div className="flex flex-row space-x-4">
                     {/* Map the stars dynamically based on the rating */}
                     {Array.from({ length: maxRating }, (_, index) => (
                       <div
@@ -76,13 +91,17 @@ const Feedback = () => {
                 </div>
                 <div>
                 <Label>Nice! Do you mind telling us about your experience?</Label>
-                <div className="w-full h-32 rounded-md border-2 border-spacing-2 p-2">
-                  <InputText>FitFlare is perfect for students</InputText>
+                <div className="w-full h-32 rounded-md py-2">
+                  <textarea
+                    value={review}
+                    className='h-full w-full p-2 border-2 rounded-md'
+                    onChange={(e) => setReview(e.target.value)}
+                  />
                 </div>
               </div>
               <div className="flex-1 flex-col align-baseline justify-end">
                 <BlueButton props={BlueButtonProps} />
-                <WhiteButton props={WhiteButtonProps} />
+                {/* <WhiteButton props={WhiteButtonProps} /> */}
               </div>
               </div>
 

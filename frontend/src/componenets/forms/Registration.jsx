@@ -1,104 +1,91 @@
-import React from 'react'
-import Label from '../Label'
-import InputText from '../InputText'
-import BlueButton from '../buttons/BlueButton'
-import WhiteButton from '../buttons/WhiteButton'
-import HomeWhiteButton from '../buttons/HomeWhiteButton'
-import useFormContext from '../../hooks/useFormContext'
-
+import Label from '../Label';
+import HomeWhiteButton from '../buttons/HomeWhiteButton';
+import WhiteButton from '../buttons/WhiteButton';
+import useFormContext from '../../hooks/useFormContext';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useState } from 'react';
 
 const Registration = () => {
-    function eventHandler(){
-        console.log("hello")
+  const { handleChange, errors, data, canSubmit } = useFormContext();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); 
+
+  const handleClick = async () => {
+    try {
+      setLoading(true);
+      if (canSubmit) {
+        const res = await axios.post('http://localhost:3000/register', {
+          email: data.email,
+          phone: data.phoneNumber,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          city: data.city,
+          postalCode: data.postalCode,
+        })
+  
+        const userId = res.data.id;
+        localStorage.setItem("user", JSON.stringify({ ...data, id: userId }));
+        navigate("/location")
+      } else {
+        alert("Fill the required field!")
       }
-    
-    const {
-        page,
-        setPage,
-        handleChange,
-        errors,
-        data, title, canSubmit
-    } = useFormContext()
-    
-      const BlueButtonProps = {
-        eventHandler: eventHandler,
-        description: "Detect current location"
-      };
-      const WhiteButtonProps = {
-        eventHandler: eventHandler,
-        description: "Cancel"
-      };
-      console.log(data)
+    } catch(error) {
+      console.log("Error: ", error)
+    } finally {
+      setLoading(false)
+    }
+  };
 
-      
-  return (
-    <div className='w-full h-full'>
-            <div className='flex-1 flex-col'>
-          <div className='flex flex-col md:flex-row md:justify-between '>
-            {console.log(title[page])}
-              <div className='flex-1 flex-row'>
-                <div className='mb-1 '>
-                  <Label>First name</Label>
-                </div>
-                  <HomeWhiteButton name="firstName" value={data?.firstName || ''} eventHandler={handleChange} inputType="text" />
-              </div>
+  const WhiteButtonProps = {
+    disabled: loading,
+    eventHandler: handleClick,
+    description: "Next"
+  };
 
-                <div className='flex-1 flex-col items-start'>
-                  <div className='mb-1'>
-                    <Label>Last name</Label>
-                  </div>
-                  <HomeWhiteButton eventHandler={eventHandler} inputType="text" />
-                </div>
-          </div>
-          <div className='flex flex-col md:flex-row md:justify-between mt-8'>
-              <div className='flex-1 flex-row'>
-                <div className='mb-1'>
-                  <Label>Email</Label>
-                </div>
-                  <HomeWhiteButton eventHandler={eventHandler} inputType="text" />
+  return ( 
+    <div className="w-full h-full flex flex-col gap-4 justify-between ">
+      {/* Email */}
+      <div className="w-full">
+        <Label>Email</Label>
+        <HomeWhiteButton name="email" value={data?.email || ''} eventHandler={handleChange} inputType="text" />
+      </div>
 
-              </div>
-          </div>
-          <div className='flex flex-col md:flex-row justify-between mt-8'>
-              <div className='flex-1 flex-col'>
-                <div className='mb-1 '>
-                  <Label>State</Label>
-                </div>
-                <HomeWhiteButton eventHandler={eventHandler} inputType="text" />
-              </div>
-
-                <div className='flex-1 flex-col items-start'>
-                  <div className='mb-1'>
-                    <Label>City</Label>
-                  </div>
-                  <HomeWhiteButton eventHandler={eventHandler} inputType="text" />
-                </div>
-          </div>
-          <div className='flex flex-col md:flex-row justify-between mt-8'>
-              <div className='flex-1 flex-col'>
-                <div className='mb-1 '>
-                  <Label>Postal Code</Label>
-                </div>
-                <HomeWhiteButton eventHandler={eventHandler} inputType="text" />
-              </div>
-
-                <div className='flex-1 flex-col items-start'>
-                  <div className='mb-1'>
-                    <Label>Phone number</Label>
-                  </div>
-                  <HomeWhiteButton eventHandler={eventHandler} inputType="text" />
-                </div>
-          </div>
-          <div className='flex-1 flex-col'> 
-          <BlueButton props={BlueButtonProps} />
-          <WhiteButton props={WhiteButtonProps} />
-
-          </div>
-
-         </div>
+      {/* First & Last Name */}
+      <div className="flex flex-col gap-4 md:flex-row md:space-x-4">
+        <div className="flex-1">
+          <Label>First name</Label>
+          <HomeWhiteButton name="firstName" value={data?.firstName || ''} eventHandler={handleChange} inputType="text" />
         </div>
+        <div className="flex-1">
+          <Label>Last name</Label>
+          <HomeWhiteButton name="lastName" value={data?.lastName || ''} eventHandler={handleChange} inputType="text" />
+        </div>
+      </div>
 
-  )
-}
+      {/* Postal Code & Phone Number */}
+      <div className="flex flex-col gap-4 md:flex-row md:space-x-4">
+        <div className="flex-1">
+          <Label>City</Label>
+          <HomeWhiteButton name="city" value={data?.postalCode || ''} eventHandler={handleChange} inputType="text" />
+        </div>
+        <div className="flex-1">
+          <Label>Postal Code</Label>
+          <HomeWhiteButton name="postalCode" value={data?.postalCode || ''} eventHandler={handleChange} inputType="text" />
+        </div>
+      </div>
 
-export default Registration
+      <div className="w-full">
+        <Label>Phone number</Label>
+        <HomeWhiteButton name="phoneNumber" value={data?.phoneNumber || ''} eventHandler={handleChange} inputType="text" />
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-col">
+        <WhiteButton props={WhiteButtonProps} />
+      </div>
+    </div>
+  );
+};
+
+export default Registration;

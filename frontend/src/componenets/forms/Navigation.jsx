@@ -1,58 +1,80 @@
-import React from 'react'
-import LeftBar from '../LeftBar'
-import RightBar from '../RightBar'
-import navLocation from '../../assets/pre-register/nav-location.png'
-import locationLeft from '../../assets/pre-register/locationLeft.png'
-import mapImage from '../../assets/pre-register/map.png'
-import Label from '../Label'
-import InputText from '../InputText'
+import { useEffect, useState } from 'react'
 import BlueButton from '../buttons/BlueButton'
-import WhiteButton from '../buttons/WhiteButton'
-import gpsImg from '../../assets/pre-register/gps.png'
+import Map from '../Map'
+import { useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 const Navigation = () => {
-    function eventHandler(){
-        console.log("hello")
-      }
-      const BlueButtonProps = {
-        eventHandler: eventHandler,
-        description: "Detect current location"
-      };
-      const WhiteButtonProps = {
-        eventHandler: eventHandler,
-        description: "Cancel"
-      };
+  const [user, setUser] = useState();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  async function eventHandler() {
+    try {
+      setLoading(true);
+
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
+
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      const storageItem = localStorage.getItem("user");
+      const localUser = JSON.parse(storageItem);
+      localUser.lat = lat;
+      localUser.lng = lng;
+
+      setUser(localUser);
+      localStorage.setItem("user", JSON.stringify(localUser));
+    } catch(error) {
+      console.log("Error while fetch location: ", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  
+  const ToGymPage = () => {
+    navigate("/gyms");
+  }
+
+  const BlueButtonProps = {
+    disabled: loading,
+    eventHandler: eventHandler,
+    description: "Detect current location"
+  };
+
+  const FindGyms = {
+    eventHandler: ToGymPage,
+    description: "Find Gyms nearby "
+  };
+
   return (
-    <div className='w-full h-full'>
-        <div className='flex-1 h-full flex-col'>
-          <div className='items-center align-middle justify-center'>
-            <img src={mapImage}></img>
-          </div>
+    <div className='w-full'>
+      <div className='flex-1 h-full flex-col'>
+        {user && user.lat && user.lng ? 
+        <>
+        {loading ? 
+        <div className='w-full h-full justify-center items-center'>
+          <Loader2 className='animate-spin' /> 
+        </div>  :
+        <>
+            <Map lat={user.lat} lng={user.lng} />
+            <BlueButton props={FindGyms} />
+        </>}
+        </> : <>
           <div className='flex-1 h-[20%]'>
-          <div className='flex-1 flex-col mt-6'>
-            <div className='mb-1 '>
-                  <Label>Location</Label>
-                </div>
-                <div className='w-[100%] border rounded-md border-spacing-2'>
-                <div className='my-2 ml-4 flex flex-row justify-between pr-8'>
-                  <div>
-                  <InputText>WeWork Office Space</InputText>
-                  </div>
-                  <div>
-                  <img src={gpsImg} alt="GPS Icon" />
-                  </div>
-                </div>
+            <div className='flex-1 flex-col mt-6'>
+              
+            </div>
           </div>
+          <div className='flex-col justify-end'> 
+            <BlueButton props={BlueButtonProps} />
           </div>
-          </div>
-          <div className='flex-1 flex-col align-baseline  justify-end'> 
-          <BlueButton props={BlueButtonProps} />
-          <WhiteButton props={WhiteButtonProps} />
-
-          </div>
-
-        </div>
+        </> 
+        }
       </div>
+    </div>
   )
 }
 

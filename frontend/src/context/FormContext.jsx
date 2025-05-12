@@ -15,14 +15,11 @@ export const FormProvider = ({ children }) => {
         firstName: "",
         lastName: "",
         email: "",
-        inputState: "",
         city: "",
         postalCode: "",
         phoneNumber: "",
-        review: "",
-        location: "",
-        gyms: "",
-        rating: "",
+        lat: "",
+        lng: ""
     });
 
 
@@ -65,22 +62,6 @@ export const FormProvider = ({ children }) => {
                 }
                 break;
 
-            case "rating":
-                if (!value.trim()) {
-                    errorMessage = "Rating is required.";
-                } else if (isNaN(value) || value < 1 || value > 5) {
-                    errorMessage = "Rating must be a number between 1 and 5.";
-                }
-                break;
-
-            case "review":
-                if (!value.trim()) {
-                    errorMessage = "Please provide a review.";
-                } else if (value.length < 10) {
-                    errorMessage = "Review must be at least 10 characters long.";
-                }
-                break;
-
             default:
                 break;
         }
@@ -104,17 +85,18 @@ export const FormProvider = ({ children }) => {
         }));
     };
 
-    const { lastName, phoneNumber, ...requiredInputs } = data;
+    const { lat, lng, ...requiredFields } = data;
 
-    const canSubmit =
-        Object.values(requiredInputs).every((value) => value.trim() && !errors[value]) &&
-        page === Object.keys(title).length - 1;
+    const canSubmit = Object.values(requiredFields).every(
+        (value) => typeof value === "string" && value.trim() !== ""
+    );
 
     return (
         <FormContext.Provider
             value={{
                 title,
                 page,
+                data,
                 setPage,
                 setData,
                 handleChange,

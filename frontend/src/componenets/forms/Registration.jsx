@@ -5,6 +5,7 @@ import useFormContext from '../../hooks/useFormContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useState } from 'react';
+import BlueButton from '../buttons/BlueButton';
 
 const Registration = () => {
   const { handleChange, errors, data, canSubmit } = useFormContext();
@@ -15,6 +16,13 @@ const Registration = () => {
     try {
       setLoading(true);
       if (canSubmit) {
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+  
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
         const res = await axios.post('http://localhost:3000/register', {
           email: data.email,
           phone: data.phoneNumber,
@@ -23,9 +31,9 @@ const Registration = () => {
           city: data.city,
           postalCode: data.postalCode,
         })
-  
+
         const userId = res.data.id;
-        localStorage.setItem("user", JSON.stringify({ ...data, id: userId }));
+        localStorage.setItem("user", JSON.stringify({ ...data, id: userId, lat: lat, lng: lng }));
         navigate("/location")
       } else {
         alert("Fill the required field!")
@@ -37,10 +45,16 @@ const Registration = () => {
     }
   };
 
-  const WhiteButtonProps = {
+  // const WhiteButtonProps = {
+  //   disabled: loading,
+  //   eventHandler: handleClick,
+  //   description: "Next"
+  // };
+
+  const BlueButtonProps = {
     disabled: loading,
     eventHandler: handleClick,
-    description: "Next"
+    description: "Detect current location"
   };
 
   return ( 
@@ -82,7 +96,7 @@ const Registration = () => {
 
       {/* Action Buttons */}
       <div className="flex flex-col">
-        <WhiteButton props={WhiteButtonProps} />
+        <BlueButton props={BlueButtonProps} />
       </div>
     </div>
   );

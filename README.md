@@ -55,6 +55,14 @@ GOOGLE_MAP_API_KEY=your_google_maps_api_key
 
 > 💡 You can get a database URL from providers like Supabase.
 
+#### Build and push Database schema:
+
+```bash
+npx prisma migrate
+npx prisma generate
+```
+
+
 #### Start the backend server:
 
 ```bash

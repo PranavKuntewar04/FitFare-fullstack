@@ -1,27 +1,25 @@
-import './App.css'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Home from './componenets/pages/Home'
-import Gyms from './componenets/pages/Gyms'
-import Location from './componenets/pages/Location'
-import Feedback from './componenets/pages/Feedback'
-import Test from './componenets/pages/Test'
-import { FormProvider } from './context/FormContext'
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import OnboardingPage from './pages/OnboardingPage';
+import LocationPage from './pages/LocationPage';
+import ResultsPage from './pages/ResultsPage';
+import FeedbackPage from './pages/FeedbackPage';
 
 function App() {
+  const location = useLocation();
 
   return (
-    <FormProvider>
-    <BrowserRouter>
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path="/location" element={<Location />} />
-        <Route path="/gyms" element={<Gyms />} />
-        <Route path="/feedback" element={<Feedback />} />
-        <Route path="/test" element={<Test />} />
-      </Routes>
-    </BrowserRouter>
-    </FormProvider>
-  )
+    <div className="App font-sans bg-neutral-50 min-h-screen">
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<OnboardingPage />} />
+          <Route path="/location" element={<LocationPage />} />
+          <Route path="/results" element={<ResultsPage />} />
+          <Route path="/feedback" element={<FeedbackPage />} />
+        </Routes>
+      </AnimatePresence>
+    </div>
+  );
 }
 
-export default App
+export default App;
